@@ -7,7 +7,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 @Table(name = "Materia")
 @Entity
 @SequenceGenerator(name = "materia_seq", sequenceName = "materia_secuencia", allocationSize = 1)
@@ -18,5 +20,9 @@ public class Materia extends PanacheEntityBase {
     public String nombre;
     public Integer creditos;
     public String descripcion;
+    public String tipo;  //obligatoria u optativa
+    public Integer semestre;
+
+
 
 }
