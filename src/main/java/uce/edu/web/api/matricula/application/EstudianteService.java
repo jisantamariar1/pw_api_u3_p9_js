@@ -2,7 +2,6 @@ package uce.edu.web.api.matricula.application;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.transaction.Transactional;
 import uce.edu.web.api.matricula.infraestructure.EstudianteRepository;
 import uce.edu.web.api.matricula.application.representation.EstudianteRepresentation;
@@ -14,58 +13,75 @@ import java.util.List;
 @ApplicationScoped
 @Transactional
 public class EstudianteService {
-   @Inject
-   private EstudianteRepository estudianteRepository;
 
-   public List<EstudianteRepresentation> listarTodos() {
-      List<EstudianteRepresentation> list = new ArrayList<>();
-      for(Estudiante estu)
-   }
+    @Inject
+    private EstudianteRepository estudianteRepository;
 
-   public EstudianteRepresentation consultarPorId(Integer id) {
-      // return this.estudianteRepository.findById(id.longValue());
-      return this.mapperToER(this.estudianteRepository.findById(id.longValue()));
-   }
+    public List<EstudianteRepresentation> listarTodos() {
+        List<Estudiante> lista = this.estudianteRepository.listAll();
+        List<EstudianteRepresentation> listaEstuR = new ArrayList<>();
+        
+        for (Estudiante est : lista) {
+            EstudianteRepresentation estuR = this.mapperToER(est);
+            listaEstuR.add(estuR);
+        }
+        
+        return listaEstuR;
+    }
 
-   @Transactional
-   public void crear(EstudianteRepresentation estu) {
-      this.estudianteRepository.persist(this.mapperToEstudiante(estu));
+    public EstudianteRepresentation consultarPorId(Integer id) {
+        Estudiante est = this.estudianteRepository.findById(id.longValue());
+        return this.mapperToER(est);
+    }
 
-   }
+    @Transactional
+    public void crear(EstudianteRepresentation estuR) {
+        Estudiante est = this.mapperToEstudiante(estuR);
+        this.estudianteRepository.persist(est);
+    }
 
-   @Transactional
-   public void actualizar(Integer id, Estudiante est) {
-      Estudiante estu = this.consultarPorId(id);
-      estu.apellido = est.apellido;
-      estu.nombre = est.nombre;
-      estu.fechaNacimiento = est.fechaNacimiento;
+    @Transactional
+    public void actualizar(Integer id, EstudianteRepresentation estuR) {
+        // Obtenemos la entidad gestionada por JPA para que el Dirty Checking funcione
+        Estudiante est = this.estudianteRepository.findById(id.longValue());
+        
+        est.apellido = estuR.apellido;
+        est.nombre = estuR.nombre;
+        est.fechaNacimiento = estuR.fechaNacimiento;
+        est.provincia = estuR.provincia;
+        est.genero = estuR.genero;
+    }
 
-   }
+    @Transactional
+    public void actualizarParcial(Integer id, EstudianteRepresentation estuR) {
+        Estudiante est = this.estudianteRepository.findById(id.longValue());
+        
+        if (estuR.nombre != null) {
+            est.nombre = estuR.nombre;
+        }
+        if (estuR.apellido != null) {
+            est.apellido = estuR.apellido;
+        }
+        if (estuR.fechaNacimiento != null) {
+            est.fechaNacimiento = estuR.fechaNacimiento;
+        }
+    }
 
-   @Transactional
-   public void actualizarParcial(Integer id, EstudianteRepresentation est) {
-      Estudiante estu = this.mapperToEstudiante(this.consultarPorId(id));
-      if (est.nombre != null) {
-         estu.nombre = est.nombre;
-      }
-      if (est.apellido != null) {
-         estu.apellido = est.apellido;
-      }
-      if (est.fechaNacimiento != null) {
-         estu.fechaNacimiento = est.fechaNacimiento;
-      }
-      // SE ACTUALIZA AUTOMATIICAMENTE POR DIRTY CHECKING
-   }
+    @Transactional
+    public void eliminar(Integer id) {
+        this.estudianteRepository.deleteById(id.longValue());
+    }
 
-   @Transactional
-   public void eliminar(Integer id) {
-      this.estudianteRepository.deleteById(id.longValue());
-   }
-
-   public List<EstudianteRepresentation> buscarPorProvincia(String provincia, String genero) {
-      // return this.estudianteRepository.find("provincia", provincia).list();
-      return this.estudianteRepository.find("provincia =?1 and genero =?2", provincia, genero).list();
-   }
+    public List<EstudianteRepresentation> buscarPorProvincia(String provincia, String genero) {
+        List<Estudiante> lista = this.estudianteRepository.find("provincia =?1 and genero =?2", provincia, genero).list();
+        List<EstudianteRepresentation> listaEstuR = new ArrayList<>();
+        
+        for (Estudiante est : lista) {
+            listaEstuR.add(this.mapperToER(est));
+        }
+        
+        return listaEstuR;
+    }
 
    private EstudianteRepresentation mapperToER(Estudiante est) {
       EstudianteRepresentation estuR = new EstudianteRepresentation();
@@ -78,15 +94,15 @@ public class EstudianteService {
       return estuR;
    }
 
-   private Estudiante mapperToEstudiante(Estudiante est) {
-      Estudiante estuR = new Estudiante();
-      estuR.id = est.id;
-      estuR.nombre = est.nombre;
-      estuR.apellido = est.apellido;
-      estuR.fechaNacimiento = est.fechaNacimiento;
-      estuR.genero = est.genero;
-      estuR.provincia = est.provincia;
-      return estuR;
+   private Estudiante mapperToEstudiante(EstudianteRepresentation estuR) {
+      Estudiante estu = new Estudiante();
+      estu.id = estuR.id;
+      estu.nombre = estuR.nombre;
+      estu.apellido = estuR.apellido;
+      estu.fechaNacimiento = estuR.fechaNacimiento;
+      estu.genero = estuR.genero;
+      estu.provincia = estuR.provincia;
+      return estu;
    }
 
 }

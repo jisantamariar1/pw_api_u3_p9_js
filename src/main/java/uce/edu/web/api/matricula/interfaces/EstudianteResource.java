@@ -2,7 +2,6 @@ package uce.edu.web.api.matricula.interfaces;
 
 import java.util.List;
 
-import jakarta.ws.rs.Produces;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -12,12 +11,13 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import uce.edu.web.api.matricula.application.EstudianteService;
 import uce.edu.web.api.matricula.application.HijoService;
-import uce.edu.web.api.matricula.domain.Estudiante;
+import uce.edu.web.api.matricula.application.representation.EstudianteRepresentation;
 import uce.edu.web.api.matricula.domain.Hijo;
 
 //Nivel 2
@@ -31,14 +31,14 @@ public class EstudianteResource {
     @GET
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Estudiante> listarTodos(){
+    public List<EstudianteRepresentation> listarTodos(){
         System.out.println("XXXXXXXXXXX  Listar todos los estudiantes XXXXXXXXXXX ");
         return this.estudianteService.listarTodos();
     }
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_XML)
-    public Estudiante consultarPorId(@PathParam("id") Integer idem){
+    public EstudianteRepresentation consultarPorId(@PathParam("id") Integer idem){
         return this.estudianteService.consultarPorId(idem);
     }
 
@@ -46,7 +46,7 @@ public class EstudianteResource {
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response guardar(Estudiante estu){
+    public Response guardar(EstudianteRepresentation estu){
         this.estudianteService.crear(estu);
         return Response.status(Response.Status.CREATED).entity(estu).build();
     }
@@ -55,14 +55,14 @@ public class EstudianteResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     //consume un objeto estudiantes y produce un objeto response
-    public Response actualizar(@PathParam("id") Integer id, Estudiante est){
+    public Response actualizar(@PathParam("id") Integer id, EstudianteRepresentation est){
         this.estudianteService.actualizar(id, est);
         return Response.status(209).entity(null).build();
     }
     @PATCH
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void actualizarParcial(@PathParam("id") Integer id, Estudiante est){
+    public void actualizarParcial(@PathParam("id") Integer id, EstudianteRepresentation est){
         this.estudianteService.actualizarParcial(id, est);
     }
     @DELETE
@@ -73,7 +73,7 @@ public class EstudianteResource {
     @GET
     @Path("/provincia/genero")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Estudiante> buscarPorProvincia(@QueryParam("provincia") String provincia, @QueryParam("genero") String genero){
+    public List<EstudianteRepresentation> buscarPorProvincia(@QueryParam("provincia") String provincia, @QueryParam("genero") String genero){
         System.out.println("XXXXXXXXXXX Listar por provincia  y genero XXXXXXXXX");
         return this.estudianteService.buscarPorProvincia(provincia, genero);
     }
