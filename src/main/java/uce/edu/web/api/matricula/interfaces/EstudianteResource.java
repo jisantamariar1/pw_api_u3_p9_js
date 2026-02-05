@@ -107,7 +107,8 @@ public class EstudianteResource {
 
     @GET
     @Path("/{id}/hijos")
-    @RolesAllowed("admin")
+    // @RolesAllowed("admin")
+    @PermitAll
     public List<HijoRepresentation> buscarPorIdEstudiantes(@PathParam("id") Integer id) {
         return this.hijoService.buscarPorIdEstudiante(id);
     }
